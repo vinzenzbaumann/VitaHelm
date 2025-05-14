@@ -1,29 +1,22 @@
+//predef Bibs
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <Wire.h>
 
-// WLAN-Konfiguration
-WiFiUDP udp;
-IPAddress pcIP(172, 16, 19, 11);  // Ziel-IP deines PCs
-const int udpPort = 4210;
+//Selfmade Bibs
+#include "oxymeter.h"
+#include "network.h"
+#include "accelerometer.h"
+#include "Microphone.h"
 
-// ADXL335 Pins
-#define ADXL_X_PIN 32
-#define ADXL_Y_PIN 33
-#define ADXL_Z_PIN 34
 
-// Mikrofon-Pegeltrigger (D0 vom KY-038 → z. B. GPIO 25)
-#define MICROPHONE_DIGITAL_PIN 25
-
-// MX30102 I2C-Adresse
-#define MX30102_ADDR 0xAE  // Adresse aus Scan oder Dokumentation
 
 // Timer
 hw_timer_t *timer = NULL;
-volatile bool sendData = false;
+volatile bool sendD = false;
 
 void IRAM_ATTR onTimer() {
-  sendData = true;
+  sendD = true;
 }
 
 // I2C-Scanner
@@ -66,6 +59,9 @@ void setup() {
   timerAlarmWrite(timer, 10000, true);
   timerAlarmEnable(timer);
 
+  // MAX30105 Setup
+  oxymeterSetup();
+
   Serial.println("Programm läuft...");
 }
 
@@ -85,35 +81,25 @@ void loop() {
     uint16_t x = analogRead(ADXL_X_PIN);
     uint16_t y = analogRead(ADXL_Y_PIN);
     uint16_t z = analogRead(ADXL_Z_PIN);
+    
     int micTrigger = digitalRead(MICROPHONE_DIGITAL_PIN);
 
-    // MX30102 auslesen
-    uint8_t data[6] = {0};
-    Wire.beginTransmission(MX30102_ADDR);
-    Wire.write(0x00);  // Standardbefehl (prüfen im Datenblatt!)
-    Wire.endTransmission();
-    delay(100);
-    Wire.requestFrom(MX30102_ADDR, 6);
-    int pulse = 0;
-    int oxygenSaturation = 0;
-    if (Wire.available() >= 6) {
-      for (int i = 0; i < 6; i++) {
-        data[i] = Wire.read();
-      }
-      pulse = data[0];
-      oxygenSaturation = data[1];
-    }
+    // Call Oxymeter loop to read data
+    oxymeterLoop();
+    
+    // Send data via UDP
+    oxymeterSendData();
 
     char packet[128];
-    snprintf(packet, sizeof(packet), "X:%u,Y:%u,Z:%u,MicTrigger:%d,Pulse:%d,Oxygen:%d\n", x, y, z, micTrigger, pulse, oxygenSaturation);
+    snprintf(packet, sizeof(packet), "X:%u,Y:%u,Z:%u,MicTrigger:%d\n", x, y, z, micTrigger);
 
     udp.beginPacket(pcIP, udpPort);
     udp.write((uint8_t*)packet, strlen(packet));
     udp.endPacket();
 
-    Serial.printf("Sende Daten: X=%u, Y=%u, Z=%u, Mikrofon-Trigger: %d, Puls: %d, Sauerstoff: %d\n",
-                  x, y, z, micTrigger, pulse, oxygenSaturation);
+    Serial.printf("Sende Daten: X=%u, Y=%u, Z=%u, Mikrofon-Trigger: %d\n",
+                  x, y, z, micTrigger);
 
-    sendData = false;
+    sendD = false;
   }
 }
