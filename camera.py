@@ -1,76 +1,50 @@
 import cv2
 import numpy as np
-import requests
-from datetime import datetime
+import urllib.request
 
-# IP der Kamera
-CAM_URL = "http://192.168.2.134"
+stream_url = "http://172.16.12.215/stream"
 
-# Vorherigen Zeitstempel speichern
-last_timestamp = None
+# Öffne den Stream über urllib und lese ihn als Bytes ein
+stream = urllib.request.urlopen(stream_url)
+bytes_data = b''
 
-# Lade ein Bild von der Kamera
-def get_frame():
-    try:
-        response = requests.get(f"{CAM_URL}/capture", timeout=2)
-        img_array = np.asarray(bytearray(response.content), dtype=np.uint8)
-        frame = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
-        return frame
-    except:
-        print("Fehler beim Abrufen des Bildes.")
-        return None
+while True:
+    bytes_data += stream.read(1024)
+    a = bytes_data.find(b'\xff\xd8')  # JPEG start
+    b = bytes_data.find(b'\xff\xd9')  # JPEG end
 
-# Pupillenbewegung analysieren
-def detect_pupil_movement(frame, debug=False):
-    global last_timestamp
+    if a != -1 and b != -1:
+        jpg = bytes_data[a:b+2]
+        bytes_data = bytes_data[b+2:]
+        img = cv2.imdecode(np.frombuffer(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
 
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    eyes_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
+        if img is None:
+            continue
 
-    eyes = eyes_cascade.detectMultiScale(gray, 1.1, 4)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    for (x, y, w, h) in eyes:
-        eye = gray[y:y+h, x:x+w]
-        _, thresh = cv2.threshold(eye, 30, 255, cv2.THRESH_BINARY_INV)
-        contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        # Pupillenerkennung via Haarcascade (Augen)
+        eyes_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
+        eyes = eyes_cascade.detectMultiScale(gray, 1.1, 5)
 
-        # Größter dunkler Bereich = Pupille
-        if contours:
-            pupil = max(contours, key=cv2.contourArea)
-            (cx, cy), radius = cv2.minEnclosingCircle(pupil)
-            center = (int(x + cx), int(y + cy))
+        if len(eyes) == 0:
+            print("Keine Pupillen erkannt")
+        else:
+            for (x, y, w, h) in eyes:
+                roi_gray = gray[y:y+h, x:x+w]
+                minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(roi_gray)
+                pupil_pos = (x + maxLoc[0], y + maxLoc[1])
 
-            # Zeitstempel berechnen
-            current_timestamp = datetime.now()
-            if last_timestamp:
-                time_diff = current_timestamp - last_timestamp
-                print(f"Zeitdifferenz zwischen Frames: {time_diff}")
+                # Kreis um die Pupille zeichnen
+                cv2.circle(img, pupil_pos, 5, (0, 255, 0), 2)
+                cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
 
-            last_timestamp = current_timestamp
+                print(f"Pupille erkannt bei Position: {pupil_pos}")
 
-            # Zeitstempel und Position ausgeben
-            print(f"Zeit: {current_timestamp}, Position: {center}")
-
-            if debug:
-                cv2.circle(frame, center, int(radius), (0, 255, 0), 2)
-                cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-
-    return frame
-
-# Hauptloop
-def main():
-    print("Starte Pupillenbewegungserkennung mit Zeitstempel. Drücke 'q' zum Beenden.")
-
-    while True:
-        frame = get_frame()
-        if frame is not None:
-            result = detect_pupil_movement(frame, debug=True)
-            cv2.imshow("Pupillenanalyse", result)
+        cv2.imshow('ESP32-CAM Pupillenerkennung', img)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    cv2.destroyAllWindows()
+cv2.destroyAllWindows()
 
-if __name__ == "__main__":
-    main()
