@@ -1,19 +1,32 @@
 #include <Arduino.h>
 #include "accelerometer.h"
+#include "accelerometer.h"
+#include <Adafruit_ADXL345_U.h>
+#include <Wire.h>
+
+// Globale Instanz des Sensors
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
 
 void initAccelerometer() {
-  analogReadResolution(12);
-  analogSetAttenuation(ADC_11db);
+  if (!accel.begin()) {
+    Serial.println("ADXL345 nicht gefunden – bitte Verkabelung prüfen!");
+    while (true); // Endlosschleife bei Fehler
+  }
+
+  Serial.println("ADXL345 erfolgreich initialisiert.");
+
+  // Messbereich auf +/-16g setzen
+  accel.setRange(ADXL345_RANGE_16_G);
 }
 
-uint16_t readAccelerometerX() {
-  return analogRead(ADXL_X_PIN);
-}
+AccelData getAccelerometerData() {
+  sensors_event_t event;
+  accel.getEvent(&event);
 
-uint16_t readAccelerometerY() {
-  return analogRead(ADXL_Y_PIN);
-}
+  AccelData data;
+  data.x = (int16_t)(event.acceleration.x * 100); // Skalierung: m/s² → *100 für int
+  data.y = (int16_t)(event.acceleration.y * 100);
+  data.z = (int16_t)(event.acceleration.z * 100);
 
-uint16_t readAccelerometerZ() {
-  return analogRead(ADXL_Z_PIN);
+  return data;
 }

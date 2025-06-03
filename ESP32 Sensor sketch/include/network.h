@@ -1,4 +1,3 @@
-// network.h
 #ifndef NETWORK_H
 #define NETWORK_H
 
@@ -7,7 +6,12 @@
 
 extern WiFiUDP udp;
 extern IPAddress pcIP;
-extern const int udpPort;
+extern const uint16_t udpPort;
+
+extern const char* ssid ;
+extern const char* password;
+
+
 
 void setupWiFi();
 void sendData(const char* packet);

@@ -1,21 +1,26 @@
-// network.cpp
 #include "network.h"
 
-
-
-//Wlan Config
+// Globale Netzwerkobjekte
 WiFiUDP udp;
-IPAddress pcIP(172, 16, 19, 11);  // Ziel-IP des PCs (hier jetzt Vinzenz Mac)
-const int udpPort = 4210;
+IPAddress pcIP(192, 168, 1, 100);  // Ziel-IP (z.B. PC)
+const uint16_t udpPort = 4210;     // Ziel-Port
 
+// WLAN-Zugangsdaten
+const char* ssid = "TI Roboter";
+const char* password = "ITRobot!";
+
+// WLAN verbinden
 void setupWiFi() {
-    WiFi.begin("TI Roboter", "ITRobot!"); 
+    WiFi.begin(ssid, password); 
+    Serial.print("Verbinde mit WLAN");
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
+        Serial.print(".");
     }
-    Serial.println("Verbunden mit WLAN");
+    Serial.println("\nVerbunden mit WLAN");
 }
 
+// UDP-Daten senden
 void sendData(const char* packet) {
     udp.beginPacket(pcIP, udpPort);
     udp.write((const uint8_t*)packet, strlen(packet));

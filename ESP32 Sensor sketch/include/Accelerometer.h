@@ -1,16 +1,19 @@
 #ifndef ACCELEROMETER_H
 #define ACCELEROMETER_H
 
+#include <Arduino.h>
 
-// Pin definition
-#define ADXL_X_PIN 32
-#define ADXL_Y_PIN 33
-#define ADXL_Z_PIN 34
+// Struktur zum Speichern der Achsdaten
+struct AccelData {
+  int16_t x;
+  int16_t y;
+  int16_t z;
+};
 
-
+// Initialisiert den ADXL345
 void initAccelerometer();
-uint16_t readAccelerometerX();
-uint16_t readAccelerometerY();
-uint16_t readAccelerometerZ();
+
+// Liest aktuelle Beschleunigungsdaten (x, y, z) in g * 100
+AccelData getAccelerometerData();
 
 #endif
