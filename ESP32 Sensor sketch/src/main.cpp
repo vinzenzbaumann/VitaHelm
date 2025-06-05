@@ -83,6 +83,7 @@ void loop() {
     uint16_t z = analogRead(ADXL_Z_PIN);
     
     int micTrigger = digitalRead(MICROPHONE_DIGITAL_PIN);
+    int respiratoryRate = resp_rate(micTrigger);
 
     /*// Call Oxymeter loop to read data
     oxymeterLoop();
@@ -98,7 +99,7 @@ void loop() {
     udp.endPacket();
 */
     Serial.printf("Sende Daten: X=%u, Y=%u, Z=%u, Mikrofon-Trigger: %d\n",
-                  x, y, z, micTrigger);
+                  x, y, z, respiratoryRate);
 
     sendD = false;
   }
