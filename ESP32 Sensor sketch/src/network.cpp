@@ -2,7 +2,7 @@
 
 // Globale Netzwerkobjekte
 WiFiUDP udp;
-IPAddress pcIP(192, 168, 1, 100);  // Ziel-IP (z.B. PC)
+IPAddress pcIP(172, 16, 19, 11);  // Ziel-IP (z.B. PC)
 const uint16_t udpPort = 4210;     // Ziel-Port
 
 // WLAN-Zugangsdaten

@@ -63,7 +63,7 @@ void setup() {
   timerAlarmWrite(timer, 10000, true);         // 10.000 µs = 10 ms → 100 Hz
   timerAlarmEnable(timer);
 
-  // Optional: oxymeterSetup();
+  //oxymeterSetup();
 
   Serial.println("Programm läuft...");
 }
@@ -87,6 +87,9 @@ void loop() {
 
     AccelData acc = getAccelerometerData();  // Digital auslesen
     int micTrigger = digitalRead(MICROPHONE_DIGITAL_PIN);
+
+    //oxymeterLoop();
+    //oxymeterSendData();
 
     char packet[128];
     snprintf(packet, sizeof(packet), "X:%d,Y:%d,Z:%d,MicTrigger:%d\n",
