@@ -4,21 +4,18 @@
 #include <Wire.h>
 #include "MAX30105.h"
 
-// Constants and sensor objects
 #define MX30102_ADDR 0x57
+#define RATE_SIZE 4 // <- Hier definierst du die Arraygröße direkt
 
-
-// Function declarations
+// Funktionsdeklarationen
 void oxymeterSetup();
 void oxymeterLoop();
 void oxymeterSendData();
 
-const byte RATE_SIZE = 4;
-extern byte rates[RATE_SIZE]; 
-extern byte rateSpot = 0;
-extern long lastBeat = 0;
+extern byte rates[RATE_SIZE];
+extern byte rateSpot;
+extern long lastBeat;
 extern float beatsPerMinute;
 extern int beatAvg;
 
 #endif
- 

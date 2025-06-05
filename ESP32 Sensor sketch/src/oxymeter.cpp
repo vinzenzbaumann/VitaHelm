@@ -4,6 +4,12 @@
 #include "heartRate.h"
 #include "network.h"
 
+byte rates[RATE_SIZE] = {0};
+byte rateSpot = 0;
+long lastBeat = 0;
+float beatsPerMinute = 0;
+int beatAvg = 0;
+
 MAX30105 particleSensor;
 
 
