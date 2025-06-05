@@ -49,17 +49,17 @@ void oxymeterLoop() {
     }
   }
 
-  Serial.print("IR=");
+  /*Serial.print("IR=");
   Serial.print(irValue);
   Serial.print(", BPM=");
   Serial.print(beatsPerMinute);
   Serial.print(", Avg BPM=");
-  Serial.print(beatAvg);
+  Serial.print(beatAvg);*/
 
-  if (irValue < 50000)
+  /*if (irValue < 50000)
     Serial.print(" No finger?");
   
-  Serial.println();
+  Serial.println();*/
 }
 
 /*void oxymeterSendData() {

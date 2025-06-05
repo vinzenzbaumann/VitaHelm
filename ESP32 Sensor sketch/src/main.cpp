@@ -77,7 +77,7 @@ void loop() {
     udp.beginPacket(pcIP, udpPort);
     udp.write((const uint8_t *)"1", 1);
     udp.endPacket();
-    Serial.println("Sende: 1");
+    //Serial.println("Sende: 1");
     lastSendTime = currentMillis;
   }
 
@@ -92,14 +92,14 @@ void loop() {
     //oxymeterSendData();
 
     char packet[128];
-    snprintf(packet, sizeof(packet), "X:%d,Y:%d,Z:%d,MicTrigger:%d,BPM:%d,AvgBPM:%d\n",
+    snprintf(packet, sizeof(packet), "X:%d,Y:%d,Z:%d,MicTrigger:%d,BPM:%d,AvgBPM:%d\r",
              acc.x, acc.y, acc.z, micTrigger, (int)beatsPerMinute, beatAvg);
 
     udp.beginPacket(pcIP, udpPort);
     udp.write((uint8_t *)packet, strlen(packet));
     udp.endPacket();
 
-    Serial.printf("Sende Daten: X=%d, Y=%d, Z=%d, Mikrofon-Trigger: %d, BPM=%d, Avg BPM=%d\r",
+    Serial.printf("Sende Daten: X=%d, Y=%d, Z=%d, Mikrofon-Trigger: %d, BPM=%d, Avg BPM=%d   \r",
                   acc.x, acc.y, acc.z, micTrigger, (int)beatsPerMinute, beatAvg);
   }
 }
