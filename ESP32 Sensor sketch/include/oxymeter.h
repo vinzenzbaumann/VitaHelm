@@ -13,5 +13,12 @@ void oxymeterSetup();
 void oxymeterLoop();
 void oxymeterSendData();
 
+const byte RATE_SIZE = 4;
+extern byte rates[RATE_SIZE]; 
+extern byte rateSpot = 0;
+extern long lastBeat = 0;
+extern float beatsPerMinute;
+extern int beatAvg;
+
 #endif
  

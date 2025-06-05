@@ -6,12 +6,6 @@
 
 MAX30105 particleSensor;
 
-const byte RATE_SIZE = 4;
-byte rates[RATE_SIZE]; 
-byte rateSpot = 0;
-long lastBeat = 0;
-float beatsPerMinute;
-int beatAvg;
 
 void oxymeterSetup() {
   // Initialize sensor
@@ -62,7 +56,7 @@ void oxymeterLoop() {
   Serial.println();
 }
 
-void oxymeterSendData() {
+/*void oxymeterSendData() {
   char packet[128];
   snprintf(packet, sizeof(packet), "BPM:%d,AvgBPM:%d\n", (int)beatsPerMinute, beatAvg);
 
@@ -70,5 +64,5 @@ void oxymeterSendData() {
   udp.write((uint8_t*)packet, strlen(packet));
   udp.endPacket();
   
-  Serial.printf("Sending Data: BPM=%d, Avg BPM=%d\n", (int)beatsPerMinute, beatAvg);
-}
+  Serial.printf("Sending Data: BPM=%d, Avg BPM=%d\r\n", (int)beatsPerMinute, beatAvg);
+}*/
