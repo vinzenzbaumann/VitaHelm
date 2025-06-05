@@ -59,10 +59,10 @@ void setup() {
   timerAlarmWrite(timer, 10000, true);
   timerAlarmEnable(timer);
 
-  // MAX30105 Setup
+  /*// MAX30105 Setup
   oxymeterSetup();
 
-  Serial.println("Programm läuft...");
+  Serial.println("Programm läuft...");*/
 }
 
 void loop() {
@@ -84,7 +84,7 @@ void loop() {
     
     int micTrigger = digitalRead(MICROPHONE_DIGITAL_PIN);
 
-    // Call Oxymeter loop to read data
+    /*// Call Oxymeter loop to read data
     oxymeterLoop();
     
     // Send data via UDP
@@ -92,14 +92,15 @@ void loop() {
 
     char packet[128];
     snprintf(packet, sizeof(packet), "X:%u,Y:%u,Z:%u,MicTrigger:%d\n", x, y, z, micTrigger);
-
-    udp.beginPacket(pcIP, udpPort);
+*/
+  /*  udp.beginPacket(pcIP, udpPort);
     udp.write((uint8_t*)packet, strlen(packet));
     udp.endPacket();
-
+*/
     Serial.printf("Sende Daten: X=%u, Y=%u, Z=%u, Mikrofon-Trigger: %d\n",
                   x, y, z, micTrigger);
 
     sendD = false;
   }
+  delay(100);
 }
