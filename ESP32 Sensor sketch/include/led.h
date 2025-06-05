@@ -1,18 +1,32 @@
-#ifndef LED_CONTROLLER_H
-#define LED_CONTROLLER_H
+#ifndef LED_CONTROL_H
+#define LED_CONTROL_H
 
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 
-// Konfiguration
+// === Constantes ===
 #define PIN         5
-#define PIXELCOUNT  32
+#define NUM_LEDS    50
 #define BRIGHTNESS  255
-#define HEARTBEAT_MS 1000
 
-// Öffentliche Funktionen
-void initLEDs();
-void updateMoodValue(int value);
-void pulseAnimation();
+// === Globale Objekte ===
+extern Adafruit_NeoPixel strip;
+
+// === Atmung ===
+extern const int respirationCycle;
+extern float respPhase;
+
+// === Herzschlag ===
+extern const int heartbeatInterval;
+extern unsigned long lastHeartbeat;
+extern bool heartbeatActive;
+
+// === Stimmung ===
+extern int moodValue;
+extern int moodR, moodG, moodB;
+
+// === Funktionen ===
+void updateMoodColor(int value);
+void updateLEDs();
 
 #endif
