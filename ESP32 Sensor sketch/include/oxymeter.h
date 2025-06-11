@@ -11,7 +11,6 @@
 void oxymeterSetup();
 void oxymeterLoop();
 void oxymeterSendData();
-
 extern byte rates[RATE_SIZE];
 extern byte rateSpot;
 extern long lastBeat;

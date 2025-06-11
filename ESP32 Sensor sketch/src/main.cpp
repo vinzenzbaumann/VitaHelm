@@ -63,6 +63,9 @@ void setup() {
   timerAlarmWrite(timer, 10000, true);         // 10.000 µs = 10 ms → 100 Hz
   timerAlarmEnable(timer);
 
+
+  initMicrophone();
+
   oxymeterSetup();
 
   Serial.println("Programm läuft...");
@@ -85,21 +88,25 @@ void loop() {
   if (sendD) {
     sendD = false;
 
-    AccelData acc = getAccelerometerData();  // Digital auslesen
-    int micTrigger = digitalRead(MICROPHONE_DIGITAL_PIN);
+    
 
-    oxymeterLoop();
-    //oxymeterSendData();
+    updateBreathDetection();
 
-    char packet[128];
-    snprintf(packet, sizeof(packet), "X:%d,Y:%d,Z:%d,MicTrigger:%d,BPM:%d,AvgBPM:%d\r",
-             acc.x, acc.y, acc.z, micTrigger, (int)beatsPerMinute, beatAvg);
+AccelData acc = getFilteredAccelerometerData();
+int micTrigger = digitalRead(MICROPHONE_DIGITAL_PIN);
+int micAnalog = readMicrophoneAnalog();
+float breathRate = getBreathRateBPM();
 
-    udp.beginPacket(pcIP, udpPort);
-    udp.write((uint8_t *)packet, strlen(packet));
-    udp.endPacket();
+char packet[128];
+snprintf(packet, sizeof(packet), "X:%d,Y:%d,Z:%d,MicTrigger:%d,MicAnalog:%d,BreathRate:%.1f,BPM:%d,AvgBPM:%d\r",
+         acc.x, acc.y, acc.z, micTrigger, micAnalog, breathRate, (int)beatsPerMinute, beatAvg);
 
-    Serial.printf("Sende Daten: X=%d, Y=%d, Z=%d, Mikrofon-Trigger: %d, BPM=%d, Avg BPM=%d   \r",
-                  acc.x, acc.y, acc.z, micTrigger, (int)beatsPerMinute, beatAvg);
+udp.beginPacket(pcIP, udpPort);
+udp.write((uint8_t *)packet, strlen(packet));
+udp.endPacket();
+
+Serial.printf("Sende Daten: X=%d, Y=%d, Z=%d, Mikrofon-Trigger: %d, Analog: %d, Atemfrequenz: %.1f, BPM=%d, Avg BPM=%d   \r",
+              acc.x, acc.y, acc.z, micTrigger, micAnalog, breathRate, (int)beatsPerMinute, beatAvg);
+
   }
 }

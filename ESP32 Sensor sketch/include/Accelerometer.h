@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-// Struktur zum Speichern der Achsdaten
+// Struktur zum Speichern der Achsdaten (in 0.01 g Einheiten)
 struct AccelData {
   int16_t x;
   int16_t y;
@@ -13,7 +13,10 @@ struct AccelData {
 // Initialisiert den ADXL345
 void initAccelerometer();
 
-// Liest aktuelle Beschleunigungsdaten (x, y, z) in g * 100
+// Liest aktuelle Roh-Beschleunigungsdaten (x,y,z)
 AccelData getAccelerometerData();
+
+// Liest gefilterte Beschleunigungsdaten (gleitender Mittelwert)
+AccelData getFilteredAccelerometerData();
 
 #endif
