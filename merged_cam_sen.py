@@ -31,7 +31,7 @@ previous_area = None
 previous_pos = None
 previous_time = None
 
-# Initialwerte (damit keine Fehler bei erstmaligem Aufruf)
+# Initialwerte so no error occurs
 bpm = 60
 avg_bpm = 60
 mic_trigger = 0
@@ -40,7 +40,7 @@ breath_rate = 0.0
 speed = 0
 area = 0
 delta = 0
-addr = None  # Senderadresse für Antwort
+addr = None  # sende adresse für antwort
 
 def berechne_erregungswert(bpm, avg_bpm, mic_trigger, speed, area, delta, mic_analog=0, breath_rate=0.0):
     bpm_score = min(max((bpm - 50) * 1.5, 0), 100)
@@ -51,7 +51,7 @@ def berechne_erregungswert(bpm, avg_bpm, mic_trigger, speed, area, delta, mic_an
     delta_score = min(max(delta / 2, -50), 50) + 50
 
     # Scores für MicAnalog und BreathRate (Beispielwerte, anpassbar)
-    mic_analog_score = min(max(mic_analog / 10, 0), 50)  # z.B. 0-50 Punkte
+    mic_analog_score = min(max(mic_analog / 10, 0), 50)  
     breath_rate_score = 0
     # Atemfrequenz normal (12-20 BPM) gibt Bonus, sonst weniger
     if 12 <= breath_rate <= 20:
@@ -129,7 +129,7 @@ try:
             img = None
 
         if img is None:
-            print("x Bild")
+            print("x Bild fehlt")
             continue
 
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
