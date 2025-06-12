@@ -39,7 +39,7 @@ void updateMoodColor(int value) {
 // === LEDs-Effekt : Atmung + Herzschlag ===
 void ledLoop() {
   unsigned long time = millis();
-  moodValue = random(0, 600);
+  moodValue =  200;
   updateMoodColor(moodValue);
 
   // Atmung

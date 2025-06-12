@@ -5,9 +5,9 @@
 #include <Adafruit_NeoPixel.h>
 
 // === Constantes ===
-#define PIN         5
+#define PIN         18
 #define FRONT_LED_PIN 17
-#define NUM_LEDS    50
+#define NUM_LEDS    57
 #define FRONT_LEDS 3
 #define BRIGHTNESS  255
 #
