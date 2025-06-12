@@ -31,51 +31,44 @@ previous_area = None
 previous_pos = None
 previous_time = None
 
-# Initialwerte so no error occurs
-bpm = 60
-avg_bpm = 60
 mic_trigger = 0
 mic_analog = 0
 breath_rate = 0.0
 speed = 0
 area = 0
 delta = 0
-addr = None  # sende adresse für antwort
+addr = None
+accel_magnitude = 0.0
 
-def berechne_erregungswert(bpm, avg_bpm, mic_trigger, speed, area, delta, mic_analog=0, breath_rate=0.0):
-    bpm_score = min(max((bpm - 50) * 1.5, 0), 100)
-    avg_bpm_score = min(max((avg_bpm - 50) * 1.2, 0), 100)
-    mic_score = 50 if mic_trigger else 0
-    speed_score = min(max(speed * 1.5, 0), 100)
-    area_score = min(max((area - 100) / 4, 0), 100)
-    delta_score = min(max(delta / 2, -50), 50) + 50
+def berechne_erregungswert(mic_trigger, speed, area, delta, mic_analog=0, breath_rate=0.0, accel_magnitude=0.0):
+    mic_score = 100 if mic_trigger else 0
+    mic_analog_score = min(mic_analog / 2, 100)
+    speed_score = min(speed * 2.5, 100)
+    area_score = min(max((area - 100) / 2, 0), 100)
+    delta_score = min(max(delta, -100), 100) + 100
+    accel_score = min(accel_magnitude * 10, 100)
 
-    # Scores für MicAnalog und BreathRate (Beispielwerte, anpassbar)
-    mic_analog_score = min(max(mic_analog / 10, 0), 50)  
-    breath_rate_score = 0
-    # Atemfrequenz normal (12-20 BPM) gibt Bonus, sonst weniger
     if 12 <= breath_rate <= 20:
-        breath_rate_score = 30
-    elif breath_rate > 20:
-        breath_rate_score = 10
+        breath_rate_score = 100
+    elif 8 <= breath_rate < 12 or 20 < breath_rate <= 24:
+        breath_rate_score = 60
     else:
-        breath_rate_score = 0
+        breath_rate_score = 30
 
     gesamtwert = int(
-        0.18 * bpm_score +
-        0.18 * avg_bpm_score +
         0.12 * mic_score +
+        0.12 * mic_analog_score +
         0.12 * speed_score +
         0.12 * area_score +
         0.12 * delta_score +
-        0.08 * mic_analog_score +
-        0.08 * breath_rate_score
+        0.12 * breath_rate_score +
+        0.28 * accel_score
     )
+
     return max(0, min(gesamtwert, 599))
 
 try:
     while True:
-        # 1. UDP-Daten empfangen
         sock.settimeout(0.01)
         try:
             data, addr = sock.recvfrom(1024)
@@ -89,8 +82,8 @@ try:
                     z = int(parts[2].split(":")[1])
                     mic_trigger = int(parts[3].split(":")[1])
 
-                    bpm = 60
-                    avg_bpm = 60
+                    accel_magnitude = math.sqrt(x**2 + y**2 + z**2)
+
                     mic_analog = 0
                     breath_rate = 0.0
 
@@ -99,10 +92,6 @@ try:
                             mic_analog = int(part.split(":")[1])
                         elif "BreathRate:" in part:
                             breath_rate = float(part.split(":")[1])
-                        elif "BPM:" in part and "AvgBPM" not in part:
-                            bpm = int(part.split(":")[1])
-                        elif "AvgBPM:" in part:
-                            avg_bpm = int(part.split(":")[1])
 
                 except Exception as e:
                     print(f"⚠️ Fehler beim Parsen UDP-Daten: {e}")
@@ -110,7 +99,6 @@ try:
         except socket.timeout:
             pass
 
-        # 2. Video-Stream verarbeiten (Pupillenerkennung)
         if stream is not None:
             try:
                 bytes_data += stream.read(1024)
@@ -129,7 +117,6 @@ try:
             img = None
 
         if img is None:
-            print("x Bild fehlt")
             continue
 
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -137,7 +124,6 @@ try:
         upper_half = gray[0:h//2, :]
         eyes = eye_cascade.detectMultiScale(upper_half, 1.1, 5)
 
-        # Gitter zeichnen
         for y in range(0, h, grid_spacing):
             for x in range(0, w, grid_spacing):
                 row, col = y // grid_spacing, x // grid_spacing
@@ -148,7 +134,7 @@ try:
                 cv2.putText(img, f"{row},{col}", (x+5, y+15),
                             cv2.FONT_HERSHEY_PLAIN, 1, (100, 255, 100), 1)
 
-        speed = 0  # Default zurücksetzen, falls keine Pupillenbewegung erkannt wird
+        speed = 0
 
         if len(eyes) == 0:
             print("Keine Pupillen erkannt")
@@ -179,7 +165,7 @@ try:
                             dy = pupil_pos[1] - previous_pos[1]
                             dt = current_time - previous_time
                             if dt > 0:
-                                speed = math.sqrt(dx**2 + dy**2) / dt  # px/s
+                                speed = math.sqrt(dx**2 + dy**2) / dt
 
                         previous_pos = pupil_pos
                         previous_time = current_time
@@ -195,10 +181,9 @@ try:
                         cv2.putText(img, f"Speed: {speed:.1f}px/s", (ex, ey+eh+30),
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
 
-        erregungswert = berechne_erregungswert(bpm, avg_bpm, mic_trigger, speed, area, delta, mic_analog, breath_rate)
-        print(f"\rErregungswert: {erregungswert:<3} | BPM={bpm} AvgBPM={avg_bpm} MIC={mic_trigger} MicAnalog={mic_analog} BreathRate={breath_rate:.1f} Speed={speed:.1f} Area={int(area)} Delta={delta:+.1f}", end="")
+        erregungswert = berechne_erregungswert(mic_trigger, speed, area, delta, mic_analog, breath_rate, accel_magnitude)
+        print(f"\rErregungswert: {erregungswert:<3} | MIC={mic_trigger} MicAnalog={mic_analog} BreathRate={breath_rate:.1f} Speed={speed:.1f} Area={int(area)} Delta={delta:+.1f} AccelMag={accel_magnitude:.1f}", end="")
 
-        # UDP-Antwort an ESP32 (wenn Adresse bekannt)
         if addr is not None:
             antwort = f"Erregung:{erregungswert}"
             try:
