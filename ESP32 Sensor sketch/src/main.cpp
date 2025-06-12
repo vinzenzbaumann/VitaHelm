@@ -8,6 +8,7 @@
 #include "network.h"
 #include "accelerometer.h"
 #include "Microphone.h"
+#include "LED.h"
 
 // Timer
 hw_timer_t *timer = NULL;
@@ -55,7 +56,7 @@ void setup() {
   scanI2CDevices();
 
   // Beschleunigungssensor initialisieren
-  initAccelerometer();
+ // initAccelerometer();
 
   // Timer für 100 Hz
   timer = timerBegin(0, 80, true);             // 80 MHz / 80 = 1 MHz → 1 tick = 1 µs
@@ -66,7 +67,9 @@ void setup() {
 
   initMicrophone();
 
-  oxymeterSetup();
+  //oxymeterSetup();
+
+  initLed();
 
   Serial.println("Programm läuft...");
 }
@@ -74,7 +77,8 @@ void setup() {
 void loop() {
   static unsigned long lastSendTime = 0;
   unsigned long currentMillis = millis();
-  oxymeterLoop();
+  //oxymeterLoop();
+  ledLoop();
 
   // Regelmäßiger Heartbeat an PC (alle 1000ms)
   if (currentMillis - lastSendTime >= 1000) {
