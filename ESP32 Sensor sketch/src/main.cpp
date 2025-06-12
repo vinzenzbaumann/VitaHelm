@@ -74,6 +74,7 @@ void setup() {
 void loop() {
   static unsigned long lastSendTime = 0;
   unsigned long currentMillis = millis();
+  oxymeterLoop();
 
   // Regelmäßiger Heartbeat an PC (alle 1000ms)
   if (currentMillis - lastSendTime >= 1000) {
@@ -105,8 +106,9 @@ udp.beginPacket(pcIP, udpPort);
 udp.write((uint8_t *)packet, strlen(packet));
 udp.endPacket();
 
-Serial.printf("Sende Daten: X=%d, Y=%d, Z=%d, Mikrofon-Trigger: %d, Analog: %d, Atemfrequenz: %.1f, BPM=%d, Avg BPM=%d   \r",
+Serial.printf("\rSende Daten: X=%d, Y=%d, Z=%d, Mikrofon-Trigger: %d, Analog: %d, Atemfrequenz: %.1f, BPM=%d, Avg BPM=%d   ",
               acc.x, acc.y, acc.z, micTrigger, micAnalog, breathRate, (int)beatsPerMinute, beatAvg);
+
 
   }
 }

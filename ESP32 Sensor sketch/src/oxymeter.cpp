@@ -48,27 +48,6 @@ void oxymeterLoop() {
       beatAvg /= RATE_SIZE;
     }
   }
-
-  /*Serial.print("IR=");
-  Serial.print(irValue);
-  Serial.print(", BPM=");
-  Serial.print(beatsPerMinute);
-  Serial.print(", Avg BPM=");
-  Serial.print(beatAvg);*/
-
-  /*if (irValue < 50000)
-    Serial.print(" No finger?");
-  
-  Serial.println();*/
 }
 
-/*void oxymeterSendData() {
-  char packet[128];
-  snprintf(packet, sizeof(packet), "BPM:%d,AvgBPM:%d\n", (int)beatsPerMinute, beatAvg);
-
-  udp.beginPacket(pcIP, udpPort);
-  udp.write((uint8_t*)packet, strlen(packet));
-  udp.endPacket();
   
-  Serial.printf("Sending Data: BPM=%d, Avg BPM=%d\r\n", (int)beatsPerMinute, beatAvg);
-}*/
