@@ -16,6 +16,12 @@ volatile bool sendD = false;
 
 // UDP
 
+WiFiUDP udp;  // UDP-Objekt
+const int localUdpPort = 4211; // Empfangsport für Erregungswert
+char incomingPacket[255];      // Puffer für eingehende Daten
+int erregungswert = 0;         // Empfangener Erregungswert
+
+
 
 // Timer-Interrupt-Funktion
 void IRAM_ATTR onTimer() {
@@ -69,12 +75,33 @@ void setup() {
 
   oxymeterSetup();
 
+  udp.begin(localUdpPort);  // Port zum Empfangen öffnen
+  Serial.printf("UDP-Empfangsport geöffnet: %d\n", localUdpPort);
+
+
   initLed();
 
   Serial.println("Programm läuft...");
 }
 
 void loop() {
+  int packetSize = udp.parsePacket();
+if (packetSize) {
+  int len = udp.read(incomingPacket, sizeof(incomingPacket) - 1);
+  if (len > 0) {
+    incomingPacket[len] = '\0';
+    Serial.printf("\nEmpfangen: %s\n", incomingPacket);
+    
+    if (strstr(incomingPacket, "Erregung:") != nullptr) {
+      int val = atoi(incomingPacket + 9);  // "Erregung:" hat 9 Zeichen
+      if (val >= 0 && val <= 600) {
+        erregungswert = val;
+        Serial.printf("→ Erregungswert aktualisiert: %d\n", erregungswert);
+      }
+    }
+  }
+}
+
   static unsigned long lastSendTime = 0;
   unsigned long currentMillis = millis();
   oxymeterLoop();
