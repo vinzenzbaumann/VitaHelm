@@ -16,7 +16,6 @@ volatile bool sendD = false;
 
 // UDP
 
-WiFiUDP udp;  // UDP-Objekt
 const int localUdpPort = 4211; // Empfangsport für Erregungswert
 char incomingPacket[255];      // Puffer für eingehende Daten
 int erregungswert = 0;         // Empfangener Erregungswert
