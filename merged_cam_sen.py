@@ -41,31 +41,32 @@ addr = None
 accel_magnitude = 0.0
 
 def berechne_erregungswert(mic_trigger, speed, area, delta, mic_analog=0, breath_rate=0.0, accel_magnitude=0.0):
-    mic_score = 100 if mic_trigger else 0
-    mic_analog_score = min(mic_analog / 2, 100)
-    speed_score = min(speed * 2.5, 100)
-    area_score = min(max((area - 100) / 2, 0), 100)
-    delta_score = min(max(delta, -100), 100) + 100
-    accel_score = min(accel_magnitude * 10, 100)
+    mic_score = 200 if mic_trigger else 0  # vorher 100
+    mic_analog_score = min(mic_analog * 1.5, 150)  # vorher /2, jetzt *1.5
+    speed_score = min(speed * 5, 150)  # vorher *2.5
+    area_score = min(max((area - 100) * 1.2, 0), 150)  # dynamischer
+    delta_score = min(max(delta, -200), 200) + 200  # vorher ±100
+    accel_score = min(accel_magnitude * 20, 200)  # vorher *10
 
     if 12 <= breath_rate <= 20:
-        breath_rate_score = 100
+        breath_rate_score = 150
     elif 8 <= breath_rate < 12 or 20 < breath_rate <= 24:
-        breath_rate_score = 60
+        breath_rate_score = 100
     else:
-        breath_rate_score = 30
+        breath_rate_score = 50
 
+    # Neue Gewichtung: mehr Gesamtpunkte möglich
     gesamtwert = int(
-        0.12 * mic_score +
-        0.12 * mic_analog_score +
-        0.12 * speed_score +
-        0.12 * area_score +
-        0.12 * delta_score +
-        0.12 * breath_rate_score +
-        0.28 * accel_score
+        0.2 * mic_score +
+        0.1 * mic_analog_score +
+        0.15 * speed_score +
+        0.1 * area_score +
+        0.15 * delta_score +
+        0.1 * breath_rate_score +
+        0.2 * accel_score
     )
 
-    return max(0, min(gesamtwert, 599))
+    return max(0, min(gesamtwert, 599))  # Max auf 599 begrenzen
 
 try:
     while True:
