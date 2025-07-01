@@ -2,8 +2,8 @@
 
 // Globale Netzwerkobjekte
 WiFiUDP udp;
-IPAddress pcIP(172, 16, 28, 102);  // Ziel-IP (z.B. PC)
-const uint16_t udpPort = 4210;     // Ziel-Port
+IPAddress pcIP(172, 16, 23, 99);  // Ziel-IP (z.B. PC)
+const uint16_t udpPort = 42190;     // Ziel-Port
 
 // WLAN-Zugangsdaten
 const char* ssid = "TI Roboter";

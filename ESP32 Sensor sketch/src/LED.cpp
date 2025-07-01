@@ -25,21 +25,37 @@ front.show();
 }
 // === Farbe je nach Stimmungswert festlegen ===
 void updateMoodColor(int value) {
-  if (value < 150) {
-    moodR = 0; moodG = 0; moodB = 255;
-  } else if (value < 300) {
-    moodR = 0; moodG = 255; moodB = 0;
-  } else if (value < 450) {
-    moodR = 255; moodG = 165; moodB = 0;
-  } else {
-    moodR = 255; moodG = 0; moodB = 0;
+  // Clamp value to [0…599], dann in 100er-Schritte zerlegen (0–5)
+  int index = constrain(value, 0, 599) / 100;
+
+  switch (index) {
+    case 0: // 0–99   : kräftiges Blau
+      moodR =   0; moodG =   0; moodB = 255;
+      break;
+    case 1: // 100–199: Magenta
+      moodR = 255; moodG =   0; moodB = 255;
+      break;
+    case 2: // 200–299: Cyan
+      moodR =   0; moodG = 255; moodB = 255;
+      break;
+    case 3: // 300–399: Grün
+      moodR =   0; moodG = 255; moodB =   0;
+      break;
+    case 4: // 400–499: Gelb
+      moodR = 255; moodG = 255; moodB =   0;
+      break;
+    case 5: // 500–599: Rot
+    default:
+      moodR = 255; moodG =   0; moodB =   0;
+      break;
   }
 }
 
+
 // === LEDs-Effekt : Atmung + Herzschlag ===
-void ledLoop() {
+void ledLoop(int moodValue) {
   unsigned long time = millis();
-  moodValue =  200;
+  //moodValue =  200;
   updateMoodColor(moodValue);
 
   // Atmung
@@ -59,8 +75,8 @@ void ledLoop() {
   }
 
   // Farbe + Helligkeit
-  uint8_t r = (uint8_t)(moodR * totalBrightness);
-  uint8_t g = (uint8_t)(moodG * totalBrightness);
+  uint8_t r = (uint8_t)(moodG * totalBrightness); //rot und grün Werte invertiert
+  uint8_t g = (uint8_t)(moodR * totalBrightness);
   uint8_t b = (uint8_t)(moodB * totalBrightness);
 
   for (int i = 0; i < NUM_LEDS; i++) {
