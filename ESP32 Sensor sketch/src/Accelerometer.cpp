@@ -17,7 +17,7 @@ void initAccelerometer() {
   }
 
   Serial.println("ADXL345 erfolgreich initialisiert.");
-  accel.setRange(ADXL345_RANGE_16_G);
+  accel.setRange(ADXL345_RANGE_8_G);
 
   // Filter-Buffer initialisieren mit 0
   for (int i = 0; i < FILTER_SIZE; i++) {
