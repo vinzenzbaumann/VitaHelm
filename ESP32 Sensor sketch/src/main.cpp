@@ -56,7 +56,7 @@ void setup() {
   // Mikrofon vorbereiten
   pinMode(MICROPHONE_DIGITAL_PIN, INPUT);
 
-  // I2C starten (für ESP32: SDA = 21, SCL = 22)
+  // I2C starten 
   Wire.begin(21, 22);
   scanI2CDevices();
 
@@ -136,9 +136,10 @@ udp.beginPacket(pcIP, udpPort);
 udp.write((uint8_t *)packet, strlen(packet));
 udp.endPacket();
 
-Serial.printf("\rSende Daten: X=%d, Y=%d, Z=%d, Mikrofon-Trigger: %d, Analog: %d, Atemfrequenz: %.1f, BPM=%d, Avg BPM=%d   ",
+Serial.printf("\r Sende Daten: X=%d, Y=%d, Z=%d, Mikrofon-Trigger: %d, Analog: %d, Atemfrequenz: %.1f, BPM=%d, Avg BPM=%d   ",
               acc.x, acc.y, acc.z, micTrigger, micAnalog, breathRate, (int)beatsPerMinute, beatAvg);
 
 
   }
 }
+  

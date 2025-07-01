@@ -2,7 +2,7 @@
 #define MICROPHONE_H
 
 #define MICROPHONE_DIGITAL_PIN 25   // Digitaler Pin für Trigger (KY-038 D0)
-#define MICROPHONE_ANALOG_PIN 34    // Neuer analoger Pin für Signalpegel (GPIO 34 ist ADC1)
+#define MICROPHONE_ANALOG_PIN 39   // Neuer analoger Pin für Signalpegel 
 
 void initMicrophone();
 
