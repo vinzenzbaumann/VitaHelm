@@ -8,13 +8,14 @@
 #define PIN           18
 #define FRONT_LED_PIN 17
 #define NUM_LEDS      18
+//nzur drei weiße
 #define FRONT_LEDS    3
 #define BRIGHTNESS    255
 
-// === Globale Objekte ===
+//Global objects
 extern Adafruit_NeoPixel strip;
 
-// === Stimmung ===
+// Mood
 extern int moodValue;
 
 // === Funktionen ===

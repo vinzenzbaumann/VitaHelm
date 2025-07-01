@@ -34,47 +34,46 @@ void ledLoop(int moodValue) {
   unsigned long time = millis();
   updateMoodColor(moodValue);
 
-  // Herzschlag erkannt → Helligkeit kurz auf 1.0 setzen (kurzer Puls)
+  //Herzschlöag blitzen alssne
   if (heartbeatDetected) {
     breathBrightness = 1.0;
     lastBeatTime = time;
     heartbeatDetected = false;
   }
 
-  // Herzschlag-Fading (300ms lang runter zu Min 0.2)
+  // Herzschlag wieder abblenden alssen
   unsigned long timeSinceBeat = time - lastBeatTime;
   if (timeSinceBeat < 300) {
     float fade = 1.0 - (timeSinceBeat / 300.0f);
     float heartBrightness = minBrightness + 0.8f * fade;
 
-    // BreathBrightness wird unten noch angepasst, also Merken:
-    // Wir kombinieren Herzschlag und Atmung, Herzschlag hat Priorität
+    //nach unten anpassung von breath brightness
     if (heartBrightness > breathBrightness) {
       breathBrightness = heartBrightness;
     }
   }
 
-  // --- ATMUNGSLLOGIK (digitaler Mikrofoneingang) ---
+  // ATmunglogik
   bool currentMicState = digitalRead(MICROPHONE_DIGITAL_PIN);
 
   if (currentMicState == HIGH) {
-    // Einatmen: Helligkeit langsam hoch bis max 0.8
+    // "einatmen"
     if (breathBrightness < maxBreathBrightness) {
-      breathBrightness += inhaleStep;
+      breathBrightness += inhaleStep;//nach oben
       if (breathBrightness > maxBreathBrightness)
         breathBrightness = maxBreathBrightness;
     }
   } else {
-    // Ausatmen: Helligkeit runter bis mind. 0.2
+    // "ausatmer"
     if (breathBrightness > minBrightness) {
-      breathBrightness -= exhaleStep;
+      breathBrightness -= exhaleStep;//wieder nach unten
       if (breathBrightness < minBrightness)
         breathBrightness = minBrightness;
     }
   }
   lastMicState = currentMicState;
 
-  // Farbe mit aktueller Helligkeit setzen
+  // farbe setzen
   uint8_t r = (uint8_t)(moodR * breathBrightness);
   uint8_t g = (uint8_t)(moodG * breathBrightness);
   uint8_t b = (uint8_t)(moodB * breathBrightness);
