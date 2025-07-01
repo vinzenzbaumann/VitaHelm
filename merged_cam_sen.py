@@ -48,9 +48,15 @@ def parse_udp_data(data_str):
         except:
             continue
     return result
+#scaling to 8G auflösung
+SCALE_FACTOR_ADXL_8G = 0.0156
 
 def calculate_accel_magnitude(x, y, z):
-    return math.sqrt(x*x + y*y + z*z)
+    x = x * SCALE_FACTOR_ADXL_8G;
+    y = y * SCALE_FACTOR_ADXL_8G
+    z = z* SCALE_FACTOR_ADXL_8G
+    return math.sqrt(x*x  + y*y + z*z)
+    #return math.sqrt(y*y)
 
 def clamp(value, min_val, max_val):
     return max(min_val, min(max_val, value))
