@@ -16,6 +16,7 @@ void initMicrophone() {
   lastMicState = digitalRead(MICROPHONE_DIGITAL_PIN);
 }
 
+
 void updateBreathDetection() {
   bool currentState = digitalRead(MICROPHONE_DIGITAL_PIN);
 
