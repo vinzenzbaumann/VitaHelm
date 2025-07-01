@@ -128,7 +128,7 @@ int micTrigger = digitalRead(MICROPHONE_DIGITAL_PIN);
 int micAnalog = readMicrophoneAnalog();
 float breathRate = getBreathRateBPM();
 
-char packet[128];
+char packet[256];
 snprintf(packet, sizeof(packet), "X:%d,Y:%d,Z:%d,MicTrigger:%d,MicAnalog:%d,BreathRate:%.1f,BPM:%d,AvgBPM:%d\r",
          acc.x, acc.y, acc.z, micTrigger, micAnalog, breathRate, (int)beatsPerMinute, beatAvg);
 
