@@ -7,6 +7,10 @@
 #define MX30102_ADDR 0x57
 #define RATE_SIZE 4 // 
 
+//ddeklaration für heartbeat logik
+extern volatile bool heartbeatDetected;  
+
+
 // Funktionsdeklarationen
 void oxymeterSetup();
 void oxymeterLoop();

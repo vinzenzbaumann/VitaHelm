@@ -1,33 +1,23 @@
 #include "LED.h"
+#include "oxymeter.h"  // enthält heartbeatDetected
 #include "Microphone.h"
 
 Adafruit_NeoPixel strip(NUM_LEDS, PIN, NEO_RGB + NEO_KHZ800);
 Adafruit_NeoPixel front(FRONT_LEDS, FRONT_LED_PIN, NEO_RBG + NEO_KHZ800);
 
-// Mikrofon into atemlogik
-const int micPin = digitalRead(MICROPHONE_DIGITAL_PIN);
-bool isInhaling = false;
-bool lastMicTrigger = false;
-unsigned long lastSwitchTime = 0;
-const unsigned long minSwitchInterval = 300;
+float breathBrightness = 0.2;  // Startwert (Minimum)
+unsigned long lastBeatTime = 0;
 
-float breathBrightness = 0.0;  // 0.0 bis 1.0
-float breathSpeed = 0.01;      // 
+// Atemsteuerung
+const float minBrightness = 0.2f;
+const float maxBreathBrightness = 0.8f;
+const float inhaleStep = 0.01f;
+const float exhaleStep = 0.03f;
+bool lastMicState = LOW;
 
 int moodValue = 0;
 uint8_t moodR = 0, moodG = 0, moodB = 255;
 
-// === LED-Initialisierung ===
-void initLed() {
-  strip.begin();
-  strip.setBrightness(BRIGHTNESS);
-  strip.show();
-  front.begin();
-  front.setBrightness(BRIGHTNESS);
-  front.show();
-}
-
-// === Stimmung zu Farbe ===
 void updateMoodColor(int value) {
   int index = constrain(value, 0, 599) / 100;
   switch (index) {
@@ -40,31 +30,51 @@ void updateMoodColor(int value) {
   }
 }
 
-// === Haupt-LED-Loop ===
 void ledLoop(int moodValue) {
   unsigned long time = millis();
   updateMoodColor(moodValue);
 
-  // Mikrofon lesen & Flanke erkennen
-  bool micTrigger = digitalRead(micPin);
-  if (micTrigger && !lastMicTrigger && time - lastSwitchTime > minSwitchInterval) {
-    isInhaling = !isInhaling; // Zustand wechseln
-    lastSwitchTime = time;
+  // Herzschlag erkannt → Helligkeit kurz auf 1.0 setzen (kurzer Puls)
+  if (heartbeatDetected) {
+    breathBrightness = 1.0;
+    lastBeatTime = time;
+    heartbeatDetected = false;
   }
-  lastMicTrigger = micTrigger;
 
-  // atmungsdarstellung
-  if (isInhaling) {
-    Serial.printf("                                                         %d",isInhaling);
-    
-    breathBrightness += breathSpeed;
-    if (breathBrightness > 1.0) breathBrightness = 1.0;
+  // Herzschlag-Fading (300ms lang runter zu Min 0.2)
+  unsigned long timeSinceBeat = time - lastBeatTime;
+  if (timeSinceBeat < 300) {
+    float fade = 1.0 - (timeSinceBeat / 300.0f);
+    float heartBrightness = minBrightness + 0.8f * fade;
+
+    // BreathBrightness wird unten noch angepasst, also Merken:
+    // Wir kombinieren Herzschlag und Atmung, Herzschlag hat Priorität
+    if (heartBrightness > breathBrightness) {
+      breathBrightness = heartBrightness;
+    }
+  }
+
+  // --- ATMUNGSLLOGIK (digitaler Mikrofoneingang) ---
+  bool currentMicState = digitalRead(MICROPHONE_DIGITAL_PIN);
+
+  if (currentMicState == HIGH) {
+    // Einatmen: Helligkeit langsam hoch bis max 0.8
+    if (breathBrightness < maxBreathBrightness) {
+      breathBrightness += inhaleStep;
+      if (breathBrightness > maxBreathBrightness)
+        breathBrightness = maxBreathBrightness;
+    }
   } else {
-    breathBrightness -= breathSpeed;
-    if (breathBrightness < 0.0) breathBrightness = 0.2;
+    // Ausatmen: Helligkeit runter bis mind. 0.2
+    if (breathBrightness > minBrightness) {
+      breathBrightness -= exhaleStep;
+      if (breathBrightness < minBrightness)
+        breathBrightness = minBrightness;
+    }
   }
+  lastMicState = currentMicState;
 
-  // LED-Farbe entsprechend Helligkeit setzen
+  // Farbe mit aktueller Helligkeit setzen
   uint8_t r = (uint8_t)(moodR * breathBrightness);
   uint8_t g = (uint8_t)(moodG * breathBrightness);
   uint8_t b = (uint8_t)(moodB * breathBrightness);

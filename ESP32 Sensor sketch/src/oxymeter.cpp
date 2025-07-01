@@ -9,6 +9,9 @@ byte rateSpot = 0;
 long lastBeat = 0;
 float beatsPerMinute = 0;
 int beatAvg = 0;
+//heartbeat define
+volatile bool heartbeatDetected = false;
+
 
 MAX30105 particleSensor;
 
@@ -33,6 +36,7 @@ void oxymeterLoop() {
   long irValue = particleSensor.getIR();
 
   if (checkForBeat(irValue) == true) {
+     heartbeatDetected = true;// setze hier true
     long delta = millis() - lastBeat;
     lastBeat = millis();
     beatsPerMinute = 60 / (delta / 1000.0);
