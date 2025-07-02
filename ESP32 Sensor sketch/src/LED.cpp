@@ -22,6 +22,22 @@ unsigned long breathEndTime   =   0.0;
 unsigned long breathTime      =   0.0;
 const unsigned long fadeDuration = 500; // to do abhängig von BPM
 
+
+//led lauflicht
+int currentLedIndex = 0;
+unsigned long lastAnimationUpdate = 0;
+const unsigned long animationStepDuration = 100; //
+bool animationRewind = false;  // 
+bool newBreathStatePending = false; // 
+bool targetBreathState = true;  // 
+bool animationInProgress = false;
+
+//entprellen
+unsigned long lastInputChangeTime = 0;
+const unsigned long debounceDelay = 500;
+
+
+
 //local bools
 bool einatmen = false;
 bool ausatmen = true;
@@ -82,66 +98,32 @@ globalBrightness = heartBrightness + baseBrightness;
   uint8_t b = (uint8_t)(moodB * globalBrightness);
 
 // atemlogik
-  int currentMicState = digitalRead(MICROPHONE_DIGITAL_PIN);
+int currentMicState = digitalRead(MICROPHONE_DIGITAL_PIN);
 
-  // Flankenerkennung: steigende Flanke (LOW → HIGH)
-  if (lastMicState == LOW && currentMicState == HIGH) {
-    
-    if (breathStateEinatmen) {
-      Serial.println("Einatmen erkannt");
-      LED_Num = 2;
-      breathStateEinatmen = false;  // Als nächstes kommt Ausatmen
-    } else {
-      Serial.println("Ausatmen erkannt");
-      LED_Num = 15;
-    
-  
-      breathStateEinatmen = true;   // Als nächstes kommt wieder Einatmen
+if (lastMicState == LOW && currentMicState == HIGH) {
+    unsigned long now = millis();
+    if (now - lastInputChangeTime > debounceDelay) {
+        lastInputChangeTime = now;
+
+        if (!animationInProgress) {
+            // Animation starten
+            targetBreathState = !breathStateEinatmen;
+            animationRewind = true;
+            animationInProgress = true;
+            lastAnimationUpdate = now;
+            newBreathStatePending = true;
+        } else {
+            // Animation läuft schon, Richtung wechseln und Ziel anpassen
+            animationRewind = !animationRewind;
+            targetBreathState = !targetBreathState;
+            lastAnimationUpdate = now; // Optional: Timer resetten
+        }
     }
-  }
-
-  lastMicState = currentMicState;
-
-
-
-/*
-//breath in
-if(breathRisingEdge && !einatmen){
-  if(ausatmen)
-  {
-    breathStartTime = time;
-    ausatmen = false;
-  }
-  if(breathFallingEdge)
-  {
-    breathRisingEdge = false;
-    breathFallingEdge = false;
-    einatmen = true;
-    LED_Num = 5;
-    Serial.print("Einatmen");
-
-  }
-// breath out
-if(breathRisingEdge && einatmen){
-  if(breathFallingEdge)
-  {
-    einatmen = false;
-    breathRisingEdge = false;
-    breathFallingEdge = false;
-    breathEndTime = time;
-    ausatmen = true;
-    LED_Num = 10;
-    Serial.print("Ausatmen");
-
-  }
-  
-  }
 }
+lastMicState = currentMicState;
 
-*/
+
 //Serial.println(breathRisingEdge);
-
-
 
 //breathcycle
 /*
@@ -174,15 +156,52 @@ if(breathRisingEdge && einatmen){
 */
 
 
-  // farbe setzen
-     for (int i = LED_Num; i < NUM_LEDS; i++) {
-    strip.setPixelColor(i, r, g, b);
-  }
+  unsigned long now = millis();
 
-    for (int i = 0; i < LED_Num; i++) {
-    strip.setPixelColor(i, 0, 0, 0);
-  }
-  
+if (now - lastAnimationUpdate > animationStepDuration) {
+    lastAnimationUpdate = now;
+
+    if (animationRewind) {
+        if (currentLedIndex > 0) {
+            currentLedIndex--;
+        } else {
+            // Am Ende der Rückwärtsanimation
+            animationRewind = false;
+            breathStateEinatmen = targetBreathState;  // neuen Zustand übernehmen
+            newBreathStatePending = false;
+        }
+    } else {
+        if (currentLedIndex < NUM_LEDS) {
+            currentLedIndex++;
+        } else {
+            // Animation komplett fertig
+            animationInProgress = false;
+        }
+    }
+}
+
+
+
+// LEDs setzen
+for (int i = 0; i < NUM_LEDS; i++) {
+    if (breathStateEinatmen) {
+        // Einatmen: LEDs ab hinten an, ab Index NUM_LEDS - currentLedIndex
+        if (i >= NUM_LEDS - currentLedIndex) {
+            strip.setPixelColor(i, r, g, b);
+        } else {
+            strip.setPixelColor(i, 0, 0, 0);
+        }
+    } else {
+        // Ausatmen: LEDs ab vorne aus, also LEDs mit Index < currentLedIndex aus
+        if (i < currentLedIndex) {
+            strip.setPixelColor(i, 0, 0, 0);
+        } else {
+            strip.setPixelColor(i, r, g, b);
+        }
+    }
+}
+
+
   strip.show();
 
   // Front-LEDs konstant weiß
