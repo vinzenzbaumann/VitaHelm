@@ -21,6 +21,6 @@ extern int moodValue;
 // === Funktionen ===
 void updateMoodColor(int value);
 void ledLoop(int moodValue);
-void initLed();
+
 
 #endif

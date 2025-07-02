@@ -9,6 +9,7 @@
 
 //ddeklaration für heartbeat logik
 extern volatile bool heartbeatDetected;  
+extern long irValue;
 
 
 // Funktionsdeklarationen

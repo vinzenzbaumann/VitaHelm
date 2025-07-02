@@ -78,7 +78,6 @@ void setup() {
   Serial.printf("UDP-Empfangsport geöffnet: %d\n", localUdpPort);
 
 
-  initLed();
 
   Serial.println("Programm läuft...");
 }
@@ -104,6 +103,7 @@ if (packetSize) {
   static unsigned long lastSendTime = 0;
   unsigned long currentMillis = millis();
   oxymeterLoop();
+
   ledLoop(erregungswert);
 
   // Regelmäßiger Heartbeat an PC (alle 1000ms)
@@ -135,9 +135,9 @@ snprintf(packet, sizeof(packet), "X:%d,Y:%d,Z:%d,MicTrigger:%d,MicAnalog:%d,Brea
 udp.beginPacket(pcIP, udpPort);
 udp.write((uint8_t *)packet, strlen(packet));
 udp.endPacket();
-Serial.println(micTrigger);
-Serial.printf("\r Sende Daten: X=%d, Y=%d, Z=%d, Mikrofon-Trigger: %d, Analog: %d, Atemfrequenz: %.1f, BPM=%d, Avg BPM=%d, Erregung swert=%d  ",
-              acc.x, acc.y, acc.z, micTrigger, micAnalog, breathRate, (int)beatsPerMinute, beatAvg, erregungswert);
+//Serial.println(micTrigger);
+//Serial.printf("\r Sende Daten: X=%d, Y=%d, Z=%d, Mikrofon-Trigger: %d, Analog: %d, Atemfrequenz: %.1f, BPM=%d, Avg BPM=%d, Erregung swert=%d  ",
+  //            acc.x, acc.y, acc.z, micTrigger, micAnalog, breathRate, (int)beatsPerMinute, beatAvg, erregungswert);
 
 
   }

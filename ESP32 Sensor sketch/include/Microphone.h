@@ -15,4 +15,9 @@ float getBreathRateBPM();
 // Liefert aktuellen analogen Mikrofonwert (0-4095)
 int readMicrophoneAnalog();
 
+extern bool breathFallingEdge;
+extern bool breathRisingEdge;
+
+
+
 #endif

@@ -4,11 +4,13 @@
 #include "heartRate.h"
 #include "network.h"
 
+
 byte rates[RATE_SIZE] = {0};
 byte rateSpot = 0;
 long lastBeat = 0;
 float beatsPerMinute = 0;
 int beatAvg = 0;
+long irValue = 0.0;
 //heartbeat define
 volatile bool heartbeatDetected = false;
 
@@ -33,7 +35,7 @@ void oxymeterSetup() {
 }
 
 void oxymeterLoop() {
-  long irValue = particleSensor.getIR();
+  irValue = particleSensor.getIR();
 
   if (checkForBeat(irValue) == true) {
      heartbeatDetected = true;// setze hier true
@@ -52,6 +54,7 @@ void oxymeterLoop() {
       beatAvg /= RATE_SIZE;
     }
   }
+  
 }
 
   

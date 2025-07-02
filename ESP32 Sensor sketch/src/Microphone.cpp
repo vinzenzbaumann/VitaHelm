@@ -5,6 +5,11 @@ static unsigned long lastTriggerTime = 0;
 static unsigned long prevTriggerTime = 0;
 static float breathRateBPM = 0.0;
 
+bool  breathRisingEdge = false;
+bool breathFallingEdge = false;
+
+
+
 static bool lastMicState = LOW;
 
 void initMicrophone() {
@@ -20,8 +25,11 @@ void initMicrophone() {
 void updateBreathDetection() {
   bool currentState = digitalRead(MICROPHONE_DIGITAL_PIN);
 
+
+
   // Trigger bei steigendem Signal (LOW->HIGH)
   if (lastMicState == LOW && currentState == HIGH) {
+    breathRisingEdge = true;
     prevTriggerTime = lastTriggerTime;
     lastTriggerTime = millis();
 
@@ -33,8 +41,19 @@ void updateBreathDetection() {
       }
     }
   }
-  lastMicState = currentState;
+
+  if (lastMicState == HIGH && currentState == LOW) {
+  breathFallingEdge = true;  // Hier passiert etwas bei der fallenden Flanke
 }
+  lastMicState = currentState;
+
+  
+
+
+}
+
+
+
 
 float getBreathRateBPM() {
   return breathRateBPM;
