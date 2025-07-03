@@ -23,6 +23,8 @@ void initMicrophone() {
 
 
 void updateBreathDetection() {
+
+  
   bool currentState = digitalRead(MICROPHONE_DIGITAL_PIN);
 
 
