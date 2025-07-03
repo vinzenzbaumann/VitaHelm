@@ -198,7 +198,7 @@ else {
   // LEDs setzen
 
 
-  if(time - ledTimeStart < ledFadeDuration){
+  if(time - ledTimeStart >= ledFadeDuration){
   ledTimeStart = time;
   for (int i = 0; i < NUM_LEDS; i++)
   {
