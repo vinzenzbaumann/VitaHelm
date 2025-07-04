@@ -23,7 +23,7 @@ unsigned long ledTimeStart = 0.0;
 unsigned long ledTimeCurrent =0.0;
 
 const unsigned long fadeDuration = 500; // to do abhängig von BPM
-const unsigned long ledFadeDuration= 200;
+const unsigned long ledFadeDuration= 100;
 // led lauflicht
 int currentLedIndex = 0;
 unsigned long lastAnimationUpdate = 0;
@@ -138,12 +138,10 @@ void ledLoop(int moodValue)
   }
   lastMicState = currentMicState;
 
-
-
-
+if(time - ledTimeStart >= ledFadeDuration){
+  ledTimeStart = time;
 
 if(breathStateEinatmen){
-
 
   if (currentLedIndex > 0)
         {
@@ -158,6 +156,7 @@ else {
           currentLedIndex++;
           Serial.print("aus");
         }
+}
 }
 
 
@@ -198,8 +197,8 @@ else {
   // LEDs setzen
 
 
-  if(time - ledTimeStart >= ledFadeDuration){
-  ledTimeStart = time;
+  
+  
   for (int i = 0; i < NUM_LEDS; i++)
   {
       
@@ -212,7 +211,7 @@ else {
         strip.setPixelColor(i, 0, 0, 0);
       }
   }
-  }
+  
 
   strip.show();
 
