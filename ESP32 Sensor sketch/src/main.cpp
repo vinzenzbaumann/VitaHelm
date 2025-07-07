@@ -130,14 +130,14 @@ float breathRate = getBreathRateBPM();
 
 char packet[256];
 snprintf(packet, sizeof(packet), "X:%d,Y:%d,Z:%d,MicTrigger:%d,MicAnalog:%d,BreathRate:%.1f,BPM:%d,AvgBPM:%d\r",
-         acc.x, acc.y, acc.z, micTrigger, micAnalog, breathRate, (int)beatsPerMinute, beatAvg);
+        acc.x, acc.y, acc.z, micTrigger, micAnalog, breathRate, (int)beatsPerMinute, beatAvg);
 
 udp.beginPacket(pcIP, udpPort);
 udp.write((uint8_t *)packet, strlen(packet));
 udp.endPacket();
-//Serial.println(micTrigger);
-//Serial.printf("\r Sende Daten: X=%d, Y=%d, Z=%d, Mikrofon-Trigger: %d, Analog: %d, Atemfrequenz: %.1f, BPM=%d, Avg BPM=%d, Erregung swert=%d  ",
-  //            acc.x, acc.y, acc.z, micTrigger, micAnalog, breathRate, (int)beatsPerMinute, beatAvg, erregungswert);
+Serial.println(micTrigger);
+Serial.printf("\r Sende Daten: X=%d, Y=%d, Z=%d, Mikrofon-Trigger: %d, Analog: %d, Atemfrequenz: %.1f, BPM=%d, Avg BPM=%d, Erregung swert=%d  ",
+          acc.x, acc.y, acc.z, micTrigger, micAnalog, breathRate, (int)beatsPerMinute, beatAvg, erregungswert);
 
 
   }

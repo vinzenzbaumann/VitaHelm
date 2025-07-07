@@ -23,7 +23,7 @@ unsigned long ledTimeStart = 0.0;
 unsigned long ledTimeCurrent =0.0;
 
 const unsigned long fadeDuration = 500; // to do abhängig von BPM
-const unsigned long ledFadeDuration= 100;
+const unsigned long ledFadeDuration= 50;
 // led lauflicht
 int currentLedIndex = 0;
 unsigned long lastAnimationUpdate = 0;
@@ -35,7 +35,7 @@ bool animationInProgress = false;
 
 // entprellen
 unsigned long lastInputChangeTime = 0;
-const unsigned long debounceDelay = 500;
+const unsigned long debounceDelay = 1000;
 
 // local bools
 bool einatmen = false;
@@ -98,6 +98,7 @@ void ledLoop(int moodValue)
 
   if (heartbeatDetected)
   {
+    Serial.print("Heartbeat detected");
     heartbeatDetected = false;
     heartBrightness = 1.0;
     heartbeatTime = time;
@@ -118,8 +119,8 @@ void ledLoop(int moodValue)
 
   globalBrightness = heartBrightness + baseBrightness;
 
-  uint8_t r = (uint8_t)(moodR * globalBrightness);
-  uint8_t g = (uint8_t)(moodG * globalBrightness);
+  uint8_t r = (uint8_t)(moodG * globalBrightness);
+  uint8_t g = (uint8_t)(moodR * globalBrightness);
   uint8_t b = (uint8_t)(moodB * globalBrightness);
 
   // atemlogik
