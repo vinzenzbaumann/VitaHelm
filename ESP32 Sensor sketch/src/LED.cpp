@@ -46,6 +46,8 @@ bool lastMicState = LOW;
 int moodValue = 0;
 
 uint8_t moodR = 0, moodG = 0, moodB = 255;
+float currentR = 0, currentG = 0, currentB = 255;
+const float smoothing = 0.05;
 
 void updateMoodColor(int value)
 {
@@ -119,9 +121,13 @@ void ledLoop(int moodValue)
 
   globalBrightness = heartBrightness + baseBrightness;
 
-  uint8_t r = (uint8_t)(moodG * globalBrightness);
-  uint8_t g = (uint8_t)(moodR * globalBrightness);
-  uint8_t b = (uint8_t)(moodB * globalBrightness);
+  currentR += (moodR - currentR) * smoothing;
+  currentG += (moodG - currentG) * smoothing;
+  currentB += (moodB - currentB) * smoothing;
+
+  uint8_t r = (uint8_t)(currentR * globalBrightness);
+  uint8_t g = (uint8_t)(currentG * globalBrightness);
+  uint8_t b = (uint8_t)(currentB * globalBrightness);
 
   // atemlogik
   int currentMicState = digitalRead(MICROPHONE_DIGITAL_PIN);
