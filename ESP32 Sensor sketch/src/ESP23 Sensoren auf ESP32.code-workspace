@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../../../../../Opencv/ESP23 Sensoren auf ESP32"
+		},
+		{
+			"name": "ESP32 Sensor sketch",
+			"path": ".."
+		}
+	],
+	"settings": {}
+}
