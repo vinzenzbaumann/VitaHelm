@@ -38,7 +38,7 @@ void updateBreathDetection() {
     if (prevTriggerTime != 0) {
       unsigned long interval = lastTriggerTime - prevTriggerTime;
 
-      if (interval > 300 && interval < 5000) {
+      if (interval > 1800 && interval < 5000) {
         breathRateBPM = 60000.0f / interval;
       }
     }

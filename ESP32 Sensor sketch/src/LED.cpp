@@ -35,7 +35,7 @@ bool animationInProgress = false;
 
 // entprellen
 unsigned long lastInputChangeTime = 0;
-const unsigned long debounceDelay = 1100;
+const unsigned long debounceDelay = 1800;
 
 // local bools
 bool einatmen = false;
