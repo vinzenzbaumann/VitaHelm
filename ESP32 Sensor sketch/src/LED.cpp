@@ -209,7 +209,7 @@ else {
       }
       else
       {
-        strip.setPixelColor(i, 0, 0, 0);
+        strip.setPixelColor(i, r*0.2, g*0.2, b*0.2);
       }
   }
   
