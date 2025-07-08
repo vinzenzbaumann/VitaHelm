@@ -36,8 +36,10 @@ void oxymeterSetup() {
 
 void oxymeterLoop() {
   irValue = particleSensor.getIR();
+  Serial.println(irValue);
 
   if (checkForBeat(irValue) == true) {
+    
      heartbeatDetected = true;// setze hier true
     long delta = millis() - lastBeat;
     lastBeat = millis();

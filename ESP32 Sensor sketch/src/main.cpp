@@ -88,13 +88,13 @@ if (packetSize) {
   int len = udp.read(incomingPacket, sizeof(incomingPacket) - 1);
   if (len > 0) {
     incomingPacket[len] = '\0';
-    Serial.printf("\nEmpfangen: %s\n", incomingPacket);
+    //Serial.printf("\nEmpfangen: %s\n", incomingPacket);
     
     if (strstr(incomingPacket, "Erregung:") != nullptr) {
       int val = atoi(incomingPacket + 9);  // "Erregung:" hat 9 Zeichen
       if (val >= 0 && val <= 600) {
         erregungswert = val;
-        Serial.printf("→ Erregungswert aktualisiert: %d\n", erregungswert);
+        //Serial.printf("→ Erregungswert aktualisiert: %d\n", erregungswert);
       }
     }
   }
@@ -135,9 +135,8 @@ snprintf(packet, sizeof(packet), "X:%d,Y:%d,Z:%d,MicTrigger:%d,MicAnalog:%d,Brea
 udp.beginPacket(pcIP, udpPort);
 udp.write((uint8_t *)packet, strlen(packet));
 udp.endPacket();
-Serial.println(micTrigger);
-Serial.printf("\r Sende Daten: X=%d, Y=%d, Z=%d, Mikrofon-Trigger: %d, Analog: %d, Atemfrequenz: %.1f, BPM=%d, Avg BPM=%d, Erregung swert=%d  ",
-          acc.x, acc.y, acc.z, micTrigger, micAnalog, breathRate, (int)beatsPerMinute, beatAvg, erregungswert);
+//Serial.printf("\r Sende Daten: X=%d, Y=%d, Z=%d, Mikrofon-Trigger: %d, Analog: %d, Atemfrequenz: %.1f, BPM=%d, Avg BPM=%d, Erregung swert=%d  ",
+//          acc.x, acc.y, acc.z, micTrigger, micAnalog, breathRate, (int)beatsPerMinute, beatAvg, erregungswert);
 
 
   }

@@ -4,6 +4,9 @@
 #define MICROPHONE_DIGITAL_PIN 25   // Digitaler Pin für Trigger (KY-038 D0)
 #define MICROPHONE_ANALOG_PIN 39   // Neuer analoger Pin für Signalpegel 
 
+
+
+
 void initMicrophone();
 
 // Muss in loop() regelmäßig aufgerufen werden, um Atemfrequenz zu aktualisieren
@@ -17,6 +20,8 @@ int readMicrophoneAnalog();
 
 extern bool breathFallingEdge;
 extern bool breathRisingEdge;
+
+extern unsigned long interval;
 
 
 

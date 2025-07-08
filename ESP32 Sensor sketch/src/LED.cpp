@@ -23,11 +23,13 @@ unsigned long ledTimeStart = 0.0;
 unsigned long ledTimeCurrent =0.0;
 
 const unsigned long fadeDuration = 500; // to do abhängig von BPM
-const unsigned long ledFadeDuration= 50;
+//led fade duration for breath
+
+const unsigned long ledFadeDuration = interval;
 // led lauflicht
 int currentLedIndex = 0;
 unsigned long lastAnimationUpdate = 0;
-const unsigned long animationStepDuration = 100; //
+
 bool animationRewind = false;                    //
 bool newBreathStatePending = false;              //
 bool targetBreathState = true;                   //
@@ -35,7 +37,8 @@ bool animationInProgress = false;
 
 // entprellen
 unsigned long lastInputChangeTime = 0;
-const unsigned long debounceDelay = 1100;
+
+const unsigned long debounceDelay = 1250;
 
 // local bools
 bool einatmen = false;
@@ -103,6 +106,7 @@ void ledLoop(int moodValue)
     heartBrightness = 1.0;
     heartbeatTime = time;
   }
+
 
   // Sanftes Abfallen
   unsigned long timeSinceBeat = time - heartbeatTime;

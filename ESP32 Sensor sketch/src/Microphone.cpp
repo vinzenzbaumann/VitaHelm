@@ -3,11 +3,14 @@
 
 static unsigned long lastTriggerTime = 0;
 static unsigned long prevTriggerTime = 0;
+
+unsigned long interval = 0.0;
+
 static float breathRateBPM = 0.0;
+
 
 bool  breathRisingEdge = false;
 bool breathFallingEdge = false;
-
 
 
 static bool lastMicState = LOW;
@@ -36,9 +39,9 @@ void updateBreathDetection() {
     lastTriggerTime = millis();
 
     if (prevTriggerTime != 0) {
-      unsigned long interval = lastTriggerTime - prevTriggerTime;
+      interval = lastTriggerTime - prevTriggerTime;
 
-      if (interval > 300 && interval < 5000) {
+      if (interval > 900 && interval < 5000) {
         breathRateBPM = 60000.0f / interval;
       }
     }
