@@ -9,6 +9,9 @@ import csv
 from datetime import datetime
 
 
+
+
+
 # --- Einstellungen ---
 UDP_IP = "0.0.0.0"
 UDP_PORT = 42190
@@ -144,9 +147,25 @@ def is_in_allowed_cells(x, y, w, h, spacing=GRID_SPACING):
     col = cx // spacing
     return (row, col) in ALLOWED_CELLS
 
+import socket
+import time
+
+def test(addr, sock):
+    value = 0
+    while True:
+        if addr is not None:
+            response = f"Erregung:{value}"
+            sock.sendto(response.encode(), addr)
+            print(f"Gesendet: {response} an {addr}")
+            
+            value += 99
+        time.sleep(1)
+
+    
+
 # Hauptfunktion
 def main():
-
+   #menü
     sock = setup_udp_socket()
     stream = open_stream()
     # erregungswert Glättung
@@ -163,6 +182,9 @@ def main():
     speed = None
     area = None
     delta = None
+
+    #zwei modi
+    eingabe = 't' 
 
 
     bytes_data = b''
@@ -282,7 +304,12 @@ def main():
                 smoothed_delta = smoothing_factor * delta + (1 - smoothing_factor) * smoothed_delta
 
                 print(f"Smoothed - Area: {smoothed_area}, Smoothed Speed: {smoothed_speed if 'speed' in locals() else 'N/A'}, Smoothed Delta: {smoothed_delta}")
-
+                
+                
+                if eingabe == 't':
+                    test(addr,sock)
+        
+                
                 erregungswert = calculate_erregungswert(smoothed_speed, smoothed_area, smoothed_delta, breath_rate, accel_magnitude, bpm)
 
                 # Glätten
